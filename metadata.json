@@ -1,0 +1,6 @@
+{
+  "name": "Zenvo - Multi-Vendor E-Commerce Marketplace",
+  "description": "Multi-vendor e-commerce marketplace platform for sellers, customers, and administrators with Cash on Delivery (COD), live tracking, and seller management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

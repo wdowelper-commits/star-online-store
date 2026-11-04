@@ -391,34 +391,35 @@ export const HomePage: React.FC = () => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white font-display">
-              Shop by Category
+              Shop by Category / تمام کیٹیگریز
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              Browse hand-picked products from registered independent sellers
+              Browse hand-picked products from registered independent sellers across all {categories.length} departments
             </p>
           </div>
           <Link
-            to={ROUTES.PRODUCTS}
-            className="text-xs font-bold text-[#6C47FF] hover:underline flex items-center gap-1"
+            to={ROUTES.CATEGORIES}
+            className="text-xs font-bold text-[#6C47FF] hover:underline flex items-center gap-1 bg-purple-50 dark:bg-purple-950/40 px-3 py-1.5 rounded-xl"
           >
-            <span>View All</span>
+            <span>View All ({categories.length})</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
           {categories.map((cat) => (
             <Link
               key={cat.id}
               to={`${ROUTES.PRODUCTS}?category=${cat.id}`}
               className="group p-4 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl hover:border-[#6C47FF] dark:hover:border-[#6C47FF] transition-all hover:shadow-xs text-center flex flex-col items-center"
             >
-              <div className="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-[#6C47FF] flex items-center justify-center font-bold text-base mb-2 group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-[#6C47FF] flex items-center justify-center font-bold text-base mb-2 group-hover:scale-110 group-hover:bg-[#6C47FF] group-hover:text-white transition-all">
                 {cat.name.charAt(0)}
               </div>
-              <h3 className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-[#6C47FF] transition-colors">
+              <h3 className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-[#6C47FF] transition-colors line-clamp-1">
                 {cat.name}
               </h3>
+              <span className="text-[10px] text-slate-400 mt-1">Explore →</span>
             </Link>
           ))}
         </div>

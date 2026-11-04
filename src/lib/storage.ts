@@ -137,7 +137,21 @@ export const db = {
   },
 
   // Categories
-  getCategories: (): Category[] => getStorage(STORAGE_KEYS.CATEGORIES, INITIAL_CATEGORIES),
+  getCategories: (): Category[] => {
+    const stored = getStorage(STORAGE_KEYS.CATEGORIES, INITIAL_CATEGORIES);
+    const existingIds = new Set(stored.map((c) => c.id));
+    let hasNew = false;
+    for (const cat of INITIAL_CATEGORIES) {
+      if (!existingIds.has(cat.id)) {
+        stored.push(cat);
+        hasNew = true;
+      }
+    }
+    if (hasNew) {
+      setStorage(STORAGE_KEYS.CATEGORIES, stored);
+    }
+    return stored.sort((a, b) => a.sort_order - b.sort_order);
+  },
   saveCategories: (categories: Category[]) => setStorage(STORAGE_KEYS.CATEGORIES, categories),
   createCategory: (category: Category): Category => {
     const categories = db.getCategories();

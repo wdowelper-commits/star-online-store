@@ -14,6 +14,7 @@ import { useWishlistStore } from './store/wishlistStore';
 import { HomePage } from './pages/public/HomePage';
 import { ProductListPage } from './pages/public/ProductListPage';
 import { ProductDetailPage } from './pages/public/ProductDetailPage';
+import { CategoriesPage } from './pages/public/CategoriesPage';
 import { CartPage } from './pages/public/CartPage';
 import { CheckoutPage } from './pages/public/CheckoutPage';
 import { SearchPage } from './pages/public/SearchPage';
@@ -80,6 +81,7 @@ export default function App() {
           {/* Public & Customer Routes with Navbar + Footer */}
           <Route element={<PublicLayout />}>
             <Route path="/" element={<HomePage />} />
+            <Route path="/categories" element={<CategoriesPage />} />
             <Route path="/products" element={<ProductListPage />} />
             <Route path="/products/:id" element={<ProductDetailPage />} />
             <Route path="/search" element={<SearchPage />} />

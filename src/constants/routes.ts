@@ -5,6 +5,7 @@
 export const ROUTES = {
   // Public
   HOME: '/',
+  CATEGORIES: '/categories',
   PRODUCTS: '/products',
   PRODUCT_DETAIL: (id: string = ':id') => `/products/${id}`,
   SEARCH: '/search',

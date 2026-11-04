@@ -67,17 +67,18 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
         <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
           Categories
         </label>
-        <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+        <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
           <button
             type="button"
             onClick={() => onSelectCategory(undefined)}
-            className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+            className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center justify-between ${
               !selectedCategory
                 ? 'bg-[#EDE9FF] text-[#6C47FF] dark:bg-[#6C47FF]/20 font-bold'
                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
             }`}
           >
-            All Categories
+            <span>All Categories / تمام</span>
+            <span className="text-[10px] opacity-70">({categories.length})</span>
           </button>
           {categories.map((cat) => (
             <button

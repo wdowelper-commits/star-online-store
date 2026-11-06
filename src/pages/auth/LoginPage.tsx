@@ -111,9 +111,12 @@ export const LoginPage: React.FC = () => {
               Autofill
             </button>
           </div>
-          <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-600 dark:text-slate-300">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] text-slate-600 dark:text-slate-300">
             <div>
               <span className="text-slate-400">Username:</span> <code className="font-bold text-slate-800 dark:text-slate-100">admin</code>
+            </div>
+            <div>
+              <span className="text-slate-400">Email:</span> <code className="font-bold text-slate-800 dark:text-slate-100">admin@zenvo.com</code>
             </div>
             <div>
               <span className="text-slate-400">Password:</span> <code className="font-bold text-slate-800 dark:text-slate-100">admin123@#</code>

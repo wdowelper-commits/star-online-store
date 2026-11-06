@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Package, Trash2, Check, X, ShieldAlert, CheckCircle, ExternalLink, Plus, AlertCircle } from 'lucide-react';
+import { Package, Trash2, Check, X, ShieldAlert, CheckCircle, ExternalLink, Plus, AlertCircle, Edit } from 'lucide-react';
 import { productService } from '../../services/productService';
 import { categoryService } from '../../services/categoryService';
 import { Product } from '../../types';
@@ -25,6 +25,86 @@ export const AdminProductsPage: React.FC = () => {
   const [images, setImages] = useState<string[]>([]);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Edit Product Modal State
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editCategoryId, setEditCategoryId] = useState('');
+  const [editPrice, setEditPrice] = useState('');
+  const [editComparePrice, setEditComparePrice] = useState('');
+  const [editStock, setEditStock] = useState('');
+  const [editImages, setEditImages] = useState<string[]>([]);
+  const [editError, setEditError] = useState('');
+  const [isEditSubmitting, setIsEditSubmitting] = useState(false);
+
+  const handleOpenEditModal = (p: Product) => {
+    setEditingProduct(p);
+    setEditTitle(p.title);
+    setEditDescription(p.description);
+    setEditCategoryId(p.category_id || categories[0]?.id || '');
+    setEditPrice(String(p.price));
+    setEditComparePrice(p.compare_at_price ? String(p.compare_at_price) : '');
+    setEditStock(String(p.stock));
+    const urls = p.images?.map((img) => img.url) || [p.thumbnail_url || ''];
+    setEditImages(urls.filter(Boolean));
+    setEditError('');
+  };
+
+  const handleUpdateProduct = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProduct) return;
+    setEditError('');
+
+    const numericPrice = parseFloat(editPrice);
+    const numericStock = parseInt(editStock, 10);
+
+    if (!editTitle.trim() || !editDescription.trim()) {
+      setEditError('Please provide title and description.');
+      return;
+    }
+    if (isNaN(numericPrice) || numericPrice <= 0) {
+      setEditError('Please enter a valid price.');
+      return;
+    }
+    if (isNaN(numericStock) || numericStock < 0) {
+      setEditError('Please enter a valid stock quantity.');
+      return;
+    }
+    if (editImages.length === 0) {
+      setEditError('Meharbani karke kam az kam 1 product image upload karein ya image URL add karein.');
+      return;
+    }
+
+    setIsEditSubmitting(true);
+    try {
+      const selectedCat = categories.find((c) => c.id === editCategoryId);
+      productService.updateProduct(editingProduct.id, {
+        title: editTitle.trim(),
+        description: editDescription.trim(),
+        category_id: editCategoryId || null,
+        category_name: selectedCat?.name,
+        price: numericPrice,
+        compare_at_price: editComparePrice ? parseFloat(editComparePrice) : null,
+        stock: numericStock,
+        thumbnail_url: editImages[0] || editingProduct.thumbnail_url,
+        images: editImages.map((url, i) => ({
+          id: `img_${Date.now()}_${i}`,
+          product_id: editingProduct.id,
+          url,
+          sort_order: i,
+          created_at: new Date().toISOString(),
+        })),
+      });
+
+      setEditingProduct(null);
+      loadAllProducts();
+    } catch (err: any) {
+      setEditError(err?.message || 'Failed to update product.');
+    } finally {
+      setIsEditSubmitting(false);
+    }
+  };
 
   const categories = categoryService.getCategories();
 
@@ -257,6 +337,14 @@ export const AdminProductsPage: React.FC = () => {
                       </Link>
                       <button
                         type="button"
+                        onClick={() => handleOpenEditModal(p)}
+                        className="p-1.5 text-slate-400 hover:text-[#6C47FF] rounded-lg cursor-pointer"
+                        title="Edit Product & Photos"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
                         onClick={() => setProductToDelete(p)}
                         className="p-1.5 text-slate-400 hover:text-red-600 rounded-lg cursor-pointer"
                         title="Remove Product"
@@ -406,6 +494,143 @@ export const AdminProductsPage: React.FC = () => {
                   className="px-5 py-2.5 bg-[#6C47FF] hover:bg-[#5535E8] text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   {isSubmitting ? 'Saving...' : 'Add Product'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Product Modal */}
+      {editingProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in overflow-y-auto">
+          <div className="w-full max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative space-y-6 my-8 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white font-display">
+                  Edit Product / Product Edit Karein
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Update product details and images (URL ya Device se Upload)
+                </p>
+              </div>
+              <button
+                onClick={() => setEditingProduct(null)}
+                className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {editError && (
+              <div className="p-3 bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300 rounded-xl text-xs font-semibold flex items-center gap-2 border border-red-200 dark:border-red-900/40">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{editError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleUpdateProduct} className="space-y-5">
+              {/* Image Upload Component */}
+              <div className="p-4 bg-slate-50/70 dark:bg-slate-800/40 rounded-2xl border border-slate-200/80 dark:border-slate-700">
+                <ImageUpload
+                  images={editImages}
+                  onChange={setEditImages}
+                  maxImages={6}
+                  label="Product Photos (Device Upload ya URL)"
+                  helperText="Device se photo upload karein ya image URL paste karein."
+                />
+              </div>
+
+              {/* Title */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Product Title <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#6C47FF]"
+                />
+              </div>
+
+              {/* Category, Price, Stock */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Category <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={editCategoryId}
+                    onChange={(e) => setEditCategoryId(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#6C47FF]"
+                  >
+                    {categories.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Price (PKR) <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    value={editPrice}
+                    onChange={(e) => setEditPrice(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#6C47FF]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Stock Quantity <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min="0"
+                    value={editStock}
+                    onChange={(e) => setEditStock(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#6C47FF]"
+                  />
+                </div>
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Description <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  rows={3}
+                  required
+                  value={editDescription}
+                  onChange={(e) => setEditDescription(e.target.value)}
+                  className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#6C47FF]"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setEditingProduct(null)}
+                  className="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isEditSubmitting}
+                  className="px-5 py-2.5 bg-[#6C47FF] hover:bg-[#5535E8] text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  {isEditSubmitting ? 'Saving...' : 'Save Changes'}
                 </button>
               </div>
             </form>

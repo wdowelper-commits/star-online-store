@@ -68,8 +68,7 @@ export const authService = {
       if (password && password !== 'admin123@#') {
         throw new Error('Incorrect password. For admin panel access, enter: admin123@#');
       }
-      const admin = db.getProfileByEmail('admin@zenvo.com') || db.getProfileById('user_admin_001');
-      if (admin) return admin;
+      return db.getAdminProfile();
     }
 
     const profile = db.getProfileByEmail(identifier);

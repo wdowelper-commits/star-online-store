@@ -1,18 +1,21 @@
 import { Profile, SellerProfile, Category, Product, Coupon, Order, Address } from '../types';
 
+export const DEMO_ADMIN: Profile = {
+  id: 'user_admin_001',
+  email: 'admin@zenvo.com',
+  username: 'admin',
+  password: 'admin123@#',
+  full_name: 'Hamza Malik (Super Admin)',
+  phone: '03027628552',
+  avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+  role: 'admin',
+  status: 'active',
+  created_at: new Date(Date.now() - 90 * 86400000).toISOString(),
+  updated_at: new Date().toISOString(),
+};
+
 export const INITIAL_PROFILES: Profile[] = [
-  {
-    id: 'user_admin_001',
-    email: 'admin@zenvo.com',
-    username: 'admin',
-    full_name: 'Hamza Malik (Super Admin)',
-    phone: '03027628552',
-    avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
-    role: 'admin',
-    status: 'active',
-    created_at: new Date(Date.now() - 90 * 86400000).toISOString(),
-    updated_at: new Date().toISOString(),
-  },
+  DEMO_ADMIN,
   {
     id: 'user_seller_001',
     email: 'seller@zenvo.com',

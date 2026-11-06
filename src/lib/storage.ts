@@ -12,6 +12,7 @@ import {
   HeroSettings,
 } from '../types';
 import {
+  DEMO_ADMIN,
   INITIAL_PROFILES,
   INITIAL_SELLER_PROFILES,
   INITIAL_CATEGORIES,
@@ -21,6 +22,12 @@ import {
   INITIAL_ORDERS,
 } from './seedData';
 import { generateId } from './utils';
+
+export const DEMO_ADMIN_CREDENTIALS = {
+  username: 'admin',
+  email: 'admin@zenvo.com',
+  password: 'admin123@#',
+};
 
 const STORAGE_KEYS = {
   PROFILES: 'zenvo_profiles',
@@ -77,22 +84,39 @@ export const db = {
   },
 
   // Profiles
+  getAdminProfile: (): Profile => {
+    return DEMO_ADMIN;
+  },
   getProfiles: (): Profile[] => {
     const profiles = getStorage(STORAGE_KEYS.PROFILES, INITIAL_PROFILES);
-    // Ensure admin user has username 'admin' and updated phone
-    const adminIdx = profiles.findIndex((p) => p.email === 'admin@zenvo.com' || p.id === 'user_admin_001');
+    // Ensure admin user has username 'admin', email 'admin@zenvo.com', password 'admin123@#', and phone
+    const adminIdx = profiles.findIndex((p) => p.email === 'admin@zenvo.com' || p.id === 'user_admin_001' || p.username === 'admin');
     if (adminIdx !== -1) {
-      profiles[adminIdx].username = 'admin';
-      profiles[adminIdx].phone = '03027628552';
+      profiles[adminIdx] = {
+        ...profiles[adminIdx],
+        ...DEMO_ADMIN,
+        username: 'admin',
+        email: 'admin@zenvo.com',
+        password: 'admin123@#',
+        phone: '03027628552',
+        role: 'admin',
+        status: 'active',
+      };
+    } else {
+      profiles.unshift(DEMO_ADMIN);
     }
     return profiles;
   },
   saveProfiles: (profiles: Profile[]) => setStorage(STORAGE_KEYS.PROFILES, profiles),
   getProfileById: (id: string): Profile | undefined => {
+    if (id === 'user_admin_001') return DEMO_ADMIN;
     return db.getProfiles().find((p) => p.id === id);
   },
   getProfileByEmail: (identifier: string): Profile | undefined => {
     const clean = identifier.trim().toLowerCase();
+    if (clean === 'admin' || clean === 'admin@zenvo.com') {
+      return DEMO_ADMIN;
+    }
     return db.getProfiles().find(
       (p) =>
         p.email.toLowerCase() === clean ||

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Layers, Plus, Edit, Trash2, CheckCircle2, AlertCircle, X } from 'lucide-react';
+import { Layers, Plus, Edit, Trash2, CheckCircle2, AlertCircle, X, Image as ImageIcon } from 'lucide-react';
 import { categoryService } from '../../services/categoryService';
 import { productService } from '../../services/productService';
 import { Category } from '../../types';
+import { ImageUpload } from '../../components/common/ImageUpload';
 
 export const AdminCategoriesPage: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -13,6 +14,7 @@ export const AdminCategoriesPage: React.FC = () => {
   const [slug, setSlug] = useState('');
   const [sortOrder, setSortOrder] = useState('0');
   const [isFeatured, setIsFeatured] = useState(false);
+  const [iconImages, setIconImages] = useState<string[]>([]);
   const [error, setError] = useState('');
 
   const loadCategories = () => {
@@ -29,6 +31,7 @@ export const AdminCategoriesPage: React.FC = () => {
     setSlug('');
     setSortOrder('0');
     setIsFeatured(false);
+    setIconImages([]);
     setError('');
     setIsModalOpen(true);
   };
@@ -39,6 +42,7 @@ export const AdminCategoriesPage: React.FC = () => {
     setSlug(cat.slug);
     setSortOrder(String(cat.sort_order));
     setIsFeatured(cat.is_featured);
+    setIconImages(cat.icon_url ? [cat.icon_url] : []);
     setError('');
     setIsModalOpen(true);
   };
@@ -53,12 +57,14 @@ export const AdminCategoriesPage: React.FC = () => {
     }
 
     try {
+      const iconUrl = iconImages[0] || '';
       if (editingCategory) {
         categoryService.updateCategory(editingCategory.id, {
           name: name.trim(),
           slug: slug.trim() || name.toLowerCase().replace(/[^a-z0-9]/g, '-'),
           sort_order: parseInt(sortOrder, 10) || 0,
           is_featured: isFeatured,
+          icon_url: iconUrl,
         });
       } else {
         categoryService.createCategory({
@@ -66,6 +72,7 @@ export const AdminCategoriesPage: React.FC = () => {
           slug: slug.trim() || name.toLowerCase().replace(/[^a-z0-9]/g, '-'),
           sort_order: parseInt(sortOrder, 10) || 0,
           is_featured: isFeatured,
+          icon_url: iconUrl,
         });
       }
       setIsModalOpen(false);
@@ -110,6 +117,7 @@ export const AdminCategoriesPage: React.FC = () => {
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 text-slate-400 uppercase tracking-wider text-[10px]">
+                <th className="py-3 px-4">Image / Icon</th>
                 <th className="py-3 px-4">Category Name</th>
                 <th className="py-3 px-4">Slug Identifier</th>
                 <th className="py-3 px-4">Homepage Featured</th>
@@ -120,6 +128,19 @@ export const AdminCategoriesPage: React.FC = () => {
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {categories.map((cat) => (
                 <tr key={cat.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                  <td className="py-3 px-4">
+                    {cat.icon_url && (cat.icon_url.startsWith('http://') || cat.icon_url.startsWith('https://') || cat.icon_url.startsWith('data:image')) ? (
+                      <img
+                        src={cat.icon_url}
+                        alt={cat.name}
+                        className="w-10 h-10 rounded-xl object-cover border border-slate-200 dark:border-slate-700 bg-slate-100 shrink-0"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-[#6C47FF] flex items-center justify-center font-bold text-sm border border-purple-100 dark:border-purple-900/40 shrink-0">
+                        {cat.name.charAt(0)}
+                      </div>
+                    )}
+                  </td>
                   <td className="py-3 px-4 font-bold text-slate-900 dark:text-white">
                     {cat.name}
                   </td>
@@ -165,27 +186,38 @@ export const AdminCategoriesPage: React.FC = () => {
 
       {/* Add / Edit Category Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fade-in">
-          <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl relative space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in overflow-y-auto">
+          <div className="w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-7 shadow-2xl relative space-y-4 my-8 max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setIsModalOpen(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 p-1"
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1 rounded-lg"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <h3 className="text-base font-bold text-slate-900 dark:text-white font-display">
+            <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-display">
               {editingCategory ? 'Edit Category' : 'Create New Category'}
             </h3>
 
             {error && (
-              <div className="p-3 bg-red-50 text-red-700 rounded-xl text-xs flex items-center gap-1.5">
+              <div className="p-3 bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300 rounded-xl text-xs flex items-center gap-1.5 border border-red-200 dark:border-red-900/40 font-semibold">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{error}</span>
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+              {/* Category Image / Icon Upload */}
+              <div className="p-3.5 bg-slate-50/80 dark:bg-slate-800/40 rounded-2xl border border-slate-200 dark:border-slate-700">
+                <ImageUpload
+                  images={iconImages}
+                  onChange={setIconImages}
+                  maxImages={1}
+                  label="Category Image / Icon"
+                  helperText="Device se tasveer upload karein ya direct image URL paste karein."
+                />
+              </div>
+
               <div>
                 <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Category Name <span className="text-red-500">*</span>

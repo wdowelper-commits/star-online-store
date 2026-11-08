@@ -413,8 +413,16 @@ export const HomePage: React.FC = () => {
               to={`${ROUTES.PRODUCTS}?category=${cat.id}`}
               className="group p-4 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl hover:border-[#6C47FF] dark:hover:border-[#6C47FF] transition-all hover:shadow-xs text-center flex flex-col items-center"
             >
-              <div className="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-[#6C47FF] flex items-center justify-center font-bold text-base mb-2 group-hover:scale-110 group-hover:bg-[#6C47FF] group-hover:text-white transition-all">
-                {cat.name.charAt(0)}
+              <div className="w-14 h-14 rounded-2xl bg-purple-50 dark:bg-purple-950/40 text-[#6C47FF] flex items-center justify-center font-bold text-base mb-2.5 group-hover:scale-110 group-hover:shadow-md transition-all overflow-hidden border border-slate-100 dark:border-slate-800 shrink-0">
+                {cat.icon_url && (cat.icon_url.startsWith('http://') || cat.icon_url.startsWith('https://') || cat.icon_url.startsWith('data:image')) ? (
+                  <img
+                    src={cat.icon_url}
+                    alt={cat.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span>{cat.name.charAt(0)}</span>
+                )}
               </div>
               <h3 className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-[#6C47FF] transition-colors line-clamp-1">
                 {cat.name}

@@ -85,13 +85,16 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
               key={cat.id}
               type="button"
               onClick={() => onSelectCategory(cat.id)}
-              className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-2 ${
                 selectedCategory === cat.id
                   ? 'bg-[#EDE9FF] text-[#6C47FF] dark:bg-[#6C47FF]/20 font-bold'
                   : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
               }`}
             >
-              {cat.name}
+              {cat.icon_url && (cat.icon_url.startsWith('http://') || cat.icon_url.startsWith('https://') || cat.icon_url.startsWith('data:image')) ? (
+                <img src={cat.icon_url} alt="" className="w-4 h-4 rounded object-cover shrink-0" />
+              ) : null}
+              <span className="truncate">{cat.name}</span>
             </button>
           ))}
         </div>

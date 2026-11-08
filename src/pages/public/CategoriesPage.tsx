@@ -131,8 +131,16 @@ export const CategoriesPage: React.FC = () => {
                 className="group p-5 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-[#6C47FF] dark:hover:border-[#6C47FF] rounded-3xl transition-all hover:shadow-md flex flex-col justify-between"
               >
                 <div>
-                  <div className="w-12 h-12 rounded-2xl bg-purple-50 dark:bg-purple-950/40 text-[#6C47FF] flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-[#6C47FF] group-hover:text-white transition-all shadow-xs">
-                    <IconComponent className="w-6 h-6" />
+                  <div className="w-14 h-14 rounded-2xl bg-purple-50 dark:bg-purple-950/40 text-[#6C47FF] flex items-center justify-center mb-4 group-hover:scale-110 group-hover:shadow-md transition-all shadow-xs overflow-hidden border border-slate-100 dark:border-slate-800">
+                    {category.icon_url && (category.icon_url.startsWith('http://') || category.icon_url.startsWith('https://') || category.icon_url.startsWith('data:image')) ? (
+                      <img
+                        src={category.icon_url}
+                        alt={category.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <IconComponent className="w-6 h-6" />
+                    )}
                   </div>
 
                   <h3 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-[#6C47FF] transition-colors">

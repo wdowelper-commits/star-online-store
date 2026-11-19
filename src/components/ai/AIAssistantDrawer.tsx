@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Bot, Sparkles, X, Send, Loader2, MessageSquare, ShieldCheck, ArrowRight, RefreshCw, ExternalLink } from 'lucide-react';
+import { Bot, Sparkles, X, Send, Loader2, MessageSquare, ShieldCheck } from 'lucide-react';
 import { getWhatsAppSupportUrl, ZENVO_WHATSAPP_RAW } from '../../lib/whatsapp';
 import { ROUTES } from '../../constants/routes';
 import { Link } from 'react-router-dom';
@@ -19,9 +19,9 @@ const INITIAL_MESSAGES: ChatMessage[] = [
 
 Main aapki madad kar sakta hoon:
 • **WhatsApp Orders:** Official number **${ZENVO_WHATSAPP_RAW}** par foran order bhejna
-• **Admin Panel:** Username: \`admin\` | Password: \`admin123@#\`
+• **Account Help:** Apne account se secure sign in karna
 • **Showcase & Product Images:** Image URL ya file upload se tasveerein lagana
-• **Cash on Delivery:** Pure Pakistan mein baghair advance payment ke doorstep delivery
+• **Cash on Delivery:** Pure Pakistan mein doorstep delivery
 
 Aap mujh se Urdu, Roman Urdu, ya English mein koi bhi sawal pooch sakte hain!`,
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -30,7 +30,7 @@ Aap mujh se Urdu, Roman Urdu, ya English mein koi bhi sawal pooch sakte hain!`,
 
 const SUGGESTIONS = [
   'WhatsApp par order kaise karein? (03027628552)',
-  'Admin panel ka username aur password?',
+  'Admin panel mein secure sign in kaise karun?',
   'Image URL aur file upload kaise karein?',
   'Cash on Delivery kaise kaam karta hai?',
   'Authentic handcrafted leather products',
@@ -48,9 +48,7 @@ export const AIAssistantDrawer: React.FC = () => {
   };
 
   useEffect(() => {
-    if (isOpen) {
-      scrollToBottom();
-    }
+    if (isOpen) scrollToBottom();
   }, [messages, isOpen]);
 
   const handleSendMessage = async (textToSend?: string) => {
@@ -78,9 +76,7 @@ export const AIAssistantDrawer: React.FC = () => {
         }),
       });
 
-      if (!res.ok) {
-        throw new Error(`Server returned ${res.status}`);
-      }
+      if (!res.ok) throw new Error(`AI service returned ${res.status}`);
 
       const data = await res.json();
       const modelReply = data.reply || 'Khushamdeed! Main aapki kis tarah mazeed rehnumai kar sakta hoon?';
@@ -94,16 +90,8 @@ export const AIAssistantDrawer: React.FC = () => {
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         },
       ]);
-    } catch (err) {
-      // Graceful local fallback response
-      let localReply = `Assalam-o-Alaikum! Zenvo marketplace par aapka order official WhatsApp number **${ZENVO_WHATSAPP_RAW}** par direct bheja ja sakta hai. Admin credentials hain: Username \`admin\` aur password \`admin123@#\`. Product images ko URL aur device upload dono tareeqon se add kiya ja sakta hai.`;
-
-      if (userText.toLowerCase().includes('admin') || userText.toLowerCase().includes('login')) {
-        localReply = `🔒 *Admin Credentials:*\n• **Username:** \`admin\`\n• **Password:** \`admin123@#\`\n\nAap Login page par direct access kar sakte hain.`;
-      } else if (userText.toLowerCase().includes('whatsapp') || userText.toLowerCase().includes('order')) {
-        localReply = `📱 *WhatsApp Order Helpline (03027628552):*\nCart ya Checkout page par "Direct WhatsApp Order" button se foran order WhatsApp **03027628552** par send ho jata hai!`;
-      }
-
+    } catch {
+      const localReply = `Maazrat, AI service is waqt available nahi hai. Aap dobara koshish karein ya WhatsApp support **${ZENVO_WHATSAPP_RAW}** se rabta karein.`;
       setMessages((prev) => [
         ...prev,
         {
@@ -120,7 +108,6 @@ export const AIAssistantDrawer: React.FC = () => {
 
   return (
     <>
-      {/* Floating Trigger Button */}
       <div className="fixed bottom-6 right-6 z-40 flex items-center gap-2">
         <a
           href={getWhatsAppSupportUrl()}
@@ -149,10 +136,8 @@ export const AIAssistantDrawer: React.FC = () => {
         </button>
       </div>
 
-      {/* AI Assistant Chat Drawer */}
       {isOpen && (
         <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-[420px] bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col animate-slide-left">
-          {/* Header */}
           <div className="p-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-xl bg-[#6C47FF] flex items-center justify-center text-white shadow-md">
@@ -165,9 +150,7 @@ export const AIAssistantDrawer: React.FC = () => {
                     Online
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-400">
-                  Urdu · Roman Urdu · English Assistance
-                </p>
+                <p className="text-[11px] text-slate-400">Urdu · Roman Urdu · English Assistance</p>
               </div>
             </div>
 
@@ -180,11 +163,10 @@ export const AIAssistantDrawer: React.FC = () => {
             </button>
           </div>
 
-          {/* Quick Shortcuts Bar */}
           <div className="px-3 py-2 bg-purple-50/70 dark:bg-purple-950/30 border-b border-purple-100 dark:border-purple-900/30 flex items-center justify-between text-[11px]">
             <span className="font-semibold text-purple-900 dark:text-purple-300 flex items-center gap-1">
               <ShieldCheck className="w-3.5 h-3.5 text-[#6C47FF]" />
-              Admin: <code className="font-bold">admin</code> / <code className="font-bold">admin123@#</code>
+              Admin access: authorized accounts only
             </span>
             <Link
               to={ROUTES.LOGIN}
@@ -195,7 +177,6 @@ export const AIAssistantDrawer: React.FC = () => {
             </Link>
           </div>
 
-          {/* Messages Area */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.map((msg) => (
               <div
@@ -211,9 +192,7 @@ export const AIAssistantDrawer: React.FC = () => {
                 >
                   {msg.content}
                 </div>
-                <span className="text-[10px] text-slate-400 px-1 pt-1">
-                  {msg.timestamp}
-                </span>
+                <span className="text-[10px] text-slate-400 px-1 pt-1">{msg.timestamp}</span>
               </div>
             ))}
 
@@ -226,11 +205,8 @@ export const AIAssistantDrawer: React.FC = () => {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Quick Suggestion Chips */}
           <div className="p-3 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
-              Quick Questions:
-            </p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Quick Questions:</p>
             <div className="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
               {SUGGESTIONS.map((sug) => (
                 <button
@@ -245,7 +221,6 @@ export const AIAssistantDrawer: React.FC = () => {
             </div>
           </div>
 
-          {/* Input Bar */}
           <div className="p-3 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
             <form
               onSubmit={(e) => {
